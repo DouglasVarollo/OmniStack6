@@ -1,20 +1,20 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
-import { distanceInWords } from 'date-fns';
+import {formatDistance, parseISO} from 'date-fns';
 import pt from 'date-fns/locale/pt';
 import api from '../../services/api';
 import ImagePicker from 'react-native-image-picker';
 import RNFS from 'react-native-fs';
 import FileViewer from 'react-native-file-viewer';
 import socket from 'socket.io-client';
-import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+import {FlatList, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './styles';
 
 export default class Box extends Component {
   state = {
     box: {},
-  }
+  };
 
   async componentDidMount() {
     const box = await AsyncStorage.getItem('@RocketBox:box');
@@ -22,34 +22,31 @@ export default class Box extends Component {
     this.subscribeToNewFiles();
 
     const response = await api.get(`/boxes/${box}`);
-    
-    this.setState({ box: response.data });
-  };
 
-  subscribeToNewFiles = (box) => {
-    const io = socket('https://omnistack-backend.herokuapp.com');
+    this.setState({box: response.data});
+  }
+
+  subscribeToNewFiles = box => {
+    const io = socket('http://192.168.1.5:3333');
 
     io.emit('connectRoom', box);
     io.on('file', data => {
       this.setState({
         box: {
           ...this.state.box,
-          files: [
-            data,
-            ...this.state.box.files
-          ]
-        }
+          files: [data, ...this.state.box.files],
+        },
       });
     });
-  }
+  };
 
-  openFile = async (file) => {
+  openFile = async file => {
     try {
       const filePath = `${RNFS.DocumentDirectoryPath}/${file.title}`;
 
       await RFNS.downloadFile({
         fromUrl: file.url,
-        toFile: filePath
+        toFile: filePath,
       });
 
       await FileViewer.open(filePath);
@@ -58,18 +55,16 @@ export default class Box extends Component {
     }
   };
 
-  renderItem = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => this.openfile(item)}
-      style={styles.file}>
+  renderItem = ({item}) => (
+    <TouchableOpacity onPress={() => this.openfile(item)} style={styles.file}>
       <View style={styles.fileInfo}>
         <Icon name="insert-drive-file" size={24} color="#A5CFFF" />
-        <Text style={styles.fileTitle}>item.title</Text>
+        <Text style={styles.fileTitle}>{item.title}</Text>
       </View>
       <Text style={styles.fileDate}>
-        há{" "}
-        {distanceInWords(item.createdAt, new Date(), {
-          locale: pt
+        há{' '}
+        {formatDistance(parseISO(item.createdAt), new Date(), {
+          locale: pt,
         })}
       </Text>
     </TouchableOpacity>
@@ -89,7 +84,7 @@ export default class Box extends Component {
         data.append('file', {
           name: `${prefix}.${ext}`,
           type: upload.type,
-          uri: upload.uri
+          uri: upload.uri,
         });
 
         api.post(`/boxes/${this.state.box._id}/files`, data);
@@ -106,12 +101,13 @@ export default class Box extends Component {
           data={this.state.box.files}
           keyExtractor={file => file._id}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
-          renderItem={this.renderItem} />
+          renderItem={this.renderItem}
+        />
 
         <TouchableOpacity style={styles.fab} onPress={this.state.handleUpload}>
           <Icon name="cloud-upload" size={24} color="#FFF" />
         </TouchableOpacity>
       </View>
     );
-  };
+  }
 }
