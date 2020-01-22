@@ -36,7 +36,14 @@ Agora nós precisamos instalar as dependências, podemos usar o yarn ou npm:
     yarn
     // ou npm install
 
-Após a instalação das dependências, para executar a aplicação use o comando:
+Após a instalação das dependências, para executar a aplicação.
 
-    yarn start
-    // ou npm run start
+No seu celular/emulador Android:
+
+    yarn android
+    // ou npm run android
+
+No seu celular/emulador IOS:
+
+    yarn ios
+    // ou npm run ios
