@@ -5,6 +5,13 @@
 
 A ideia do projeto é criar um aplicativo semelhante ao do Dropbox, usando a stack Node.js, ReactJS e React Native.
 
+## Funcionalidades
+
+- Criar uma Box
+- Adicionar imagens a uma Box
+- Listar as imagens de uma Box
+- Adicionar múltiplas imagens e em tempo real
+
 ## Backend
 
 Para executar o backend siga as instruções do arquivo [README.md](https://github.com/DouglasVarollo/OmniStack6/blob/master/backend/README.md) que está na pasta backend.
